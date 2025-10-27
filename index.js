@@ -3,7 +3,7 @@ const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const webScrapping = require("./webScrapping");
 const axios = require("axios");
 
-import express from "express";
+const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -65,8 +65,8 @@ client.on("messageCreate", async (message) => {
 
 // Login Discord
 app.get("/", (req, res) => {
-  client.login(process.env.BOT_TOKEN);
   res.send("Bot is running!");
 });
 
+client.login(process.env.BOT_TOKEN);
 app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
