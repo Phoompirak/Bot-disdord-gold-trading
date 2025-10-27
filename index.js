@@ -1,4 +1,3 @@
-require('dotenv').config(); // โหลดก่อนใช้งานตัวแปร
 
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const webScrapping = require("./webScrapping");
@@ -8,12 +7,7 @@ import express from "express";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Bot is running!");
-});
-
-app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
-
+require('dotenv').config(); // โหลดก่อนใช้งานตัวแปร
 
 
 const client = new Client({
@@ -70,4 +64,9 @@ client.on("messageCreate", async (message) => {
 });
 
 // Login Discord
-client.login(process.env.BOT_TOKEN);
+app.get("/", (req, res) => {
+  client.login(process.env.BOT_TOKEN);
+  res.send("Bot is running!");
+});
+
+app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
