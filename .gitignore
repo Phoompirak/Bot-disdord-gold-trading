@@ -1,0 +1,6 @@
+# .gitignore file
+config.json
+/node_modules
+# other ignored files
+
+.env
