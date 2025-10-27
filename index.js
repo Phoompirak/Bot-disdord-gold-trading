@@ -52,6 +52,14 @@ async function sendDailyGoldSummary(channel) {
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
+
+  // ส่งสรุปทุกวันตอน 9 โมงเช้า (ตัวอย่าง)
+  const now = new Date();
+  const millisTill9 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0) - now;
+  setTimeout(function () {
+    sendDailyGoldSummary(channel);
+    setInterval(() => sendDailyGoldSummary(channel), 24 * 60 * 60 * 1000); // ทุก 24 ชม.
+  }, millisTill9);
 });
 
 // คำสั่งทดสอบ
