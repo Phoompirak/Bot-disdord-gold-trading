@@ -4,6 +4,18 @@ const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const webScrapping = require("./webScrapping");
 const axios = require("axios");
 
+import express from "express";
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Bot is running!");
+});
+
+app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
+
+
+
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
 });
