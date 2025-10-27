@@ -1,14 +1,13 @@
+import dotenv from "dotenv";
+import express from "express";
+import axios from "axios";
+import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
+import * as webScrapping from "./webScrapping.js";
 
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
-const webScrapping = require("./webScrapping");
-const axios = require("axios");
+dotenv.config();
 
-const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-require('dotenv').config(); // โหลดก่อนใช้งานตัวแปร
-
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
@@ -18,7 +17,7 @@ const client = new Client({
 async function getGoldPrice() {
   try {
     const res = await axios.get("https://www.goldapi.io/api/XAU/USD", {
-      headers: { "x-access-token": process.env.GOLD_API_KEY } // ใช้ dotenv
+      headers: { "x-access-token": process.env.GOLD_API_KEY },
     });
     return res.data.price;
   } catch (err) {
@@ -51,18 +50,21 @@ async function sendDailyGoldSummary(channel) {
 }
 
 client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}`);
+  console.log(`✅ Logged in as ${client.user.tag}`);
 
-  // ส่งสรุปทุกวันตอน 9 โมงเช้า (ตัวอย่าง)
+  const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
+  if (!channel) return console.error("❌ ไม่พบ Channel ID");
+
+  // ตั้งเวลาให้ส่งทุกวัน 9 โมงเช้า
   const now = new Date();
   const millisTill9 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0) - now;
-  setTimeout(function () {
+  setTimeout(() => {
     sendDailyGoldSummary(channel);
-    setInterval(() => sendDailyGoldSummary(channel), 24 * 60 * 60 * 1000); // ทุก 24 ชม.
+    setInterval(() => sendDailyGoldSummary(channel), 24 * 60 * 60 * 1000);
   }, millisTill9);
 });
 
-// คำสั่งทดสอบ
+// คำสั่ง !testsummary
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.content === "!testsummary") {
@@ -71,10 +73,7 @@ client.on("messageCreate", async (message) => {
   }
 });
 
-// Login Discord
-app.get("/", (req, res) => {
-  res.send("Bot is running!");
-});
+app.get("/", (req, res) => res.send("Bot is running!"));
 
 client.login(process.env.BOT_TOKEN);
-app.listen(PORT, () => console.log(`Web server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🌐 Web server running on port ${PORT}`));
