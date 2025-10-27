@@ -49,19 +49,42 @@ async function sendDailyGoldSummary(channel) {
   channel.send({ embeds: [embed] });
 }
 
+// ส่งสรุปทุกๆ 07:00, 12:00, 18:30
+function scheduleDailySend(channel, hour, minute) {
+  const now = new Date();
+  let target = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hour,
+    minute,
+    0,
+    0
+  );
+
+  // ถ้าเวลานั้นผ่านไปแล้ว ให้ตั้งเป็นวันพรุ่งนี้
+  if (target < now) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const delay = target - now;
+
+  setTimeout(() => {
+    sendDailyGoldSummary(channel); // ส่งครั้งแรก
+    setInterval(() => sendDailyGoldSummary(channel), 24 * 60 * 60 * 1000); // ส่งซ้ำทุกวัน
+  }, delay);
+}
+
 client.on("ready", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 
   const channel = client.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
   if (!channel) return console.error("❌ ไม่พบ Channel ID");
 
-  // ตั้งเวลาให้ส่งทุกวัน 9 โมงเช้า
-  const now = new Date();
-  const millisTill9 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0, 0) - now;
-  setTimeout(() => {
-    sendDailyGoldSummary(channel);
-    setInterval(() => sendDailyGoldSummary(channel), 24 * 60 * 60 * 1000);
-  }, millisTill9);
+  // ตัวอย่าง: ส่งที่ 07:00, 12:00, 18:30
+  scheduleDailySend(channel, 7, 0);
+  scheduleDailySend(channel, 12, 0);
+  scheduleDailySend(channel, 18, 30);
 });
 
 // คำสั่ง !testsummary
